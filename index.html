@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Millie Jumps</title>
+  <title>Jumpy Millie</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -67,15 +67,15 @@
 </head>
 <body>
 
-<audio id="backgroundMusic" loop autoplay volume="0.10">
+<audio id="backgroundMusic" loop autoplay>
   <source src="https://drive.google.com/uc?export=view&id=1iF10x9XRpDnrXgqUwwtiTxeHoiGyDaYR" type="audio/mpeg">
   Your browser does not support the audio element.
 </audio>
 <label for="volumeControl">Volume:</label>
-<input type="range" id="volumeControl" min="0" max="1" step="0.01" value="0.10">
+<input type="range" id="volumeControl" min="0" max="1" step="0.01" value="0.09">
 
-  <h1>Millie Jumps</h1>
-  <p>Press Spacebar to jump over the obstacles!</p>
+  <h1>Jumpy Millie</h1>
+  <p>Press Spacebar to jump over the capybaras!</p>
   <div id="game">
     <div id="player"></div>
     <div id="chaser"></div>
@@ -84,7 +84,10 @@
   <button id="restart" onclick="restartGame()" style="display: none;">Restart</button>
   <script>
 
-    const backgroundMusic = document.getElementById("backgroundMusic");
+
+   const backgroundMusic = document.getElementById("backgroundMusic");
+   backgroundMusic.volume = 0.09;
+
 
     function playBackgroundMusic() {
       backgroundMusic.play();
@@ -314,5 +317,5 @@ volumeControl.addEventListener("input", () => {
 </body>
 </html>
 
-
-@tristanpaulnguyen
+<p>
+<p><a href="https://www.instagram.com/tristanpaulnguyen/" target="_blank">@tristanpaulnguyen</a></p>
