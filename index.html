@@ -41,7 +41,10 @@
       z-index: 3;
     }
     .obstacle {
+      width: 65px;
+      height: 50px;
       bottom: 0;
+      background-image: url('https://i.imgur.com/0PPeeHh.png');
       z-index: 4;
     }
     .cloud {
@@ -64,12 +67,12 @@
 </head>
 <body>
 
-<audio id="backgroundMusic" loop autoplay volume="0.03">
+<audio id="backgroundMusic" loop autoplay volume="0.10">
   <source src="https://drive.google.com/uc?export=view&id=1iF10x9XRpDnrXgqUwwtiTxeHoiGyDaYR" type="audio/mpeg">
   Your browser does not support the audio element.
 </audio>
 <label for="volumeControl">Volume:</label>
-<input type="range" id="volumeControl" min="0" max="1" step="0.01" value="0.03">
+<input type="range" id="volumeControl" min="0" max="1" step="0.01" value="0.10">
 
   <h1>Millie Jumps</h1>
   <p>Press Spacebar to jump over the obstacles!</p>
@@ -136,11 +139,8 @@ function createObstacle() {
 
   const obstacle = document.createElement("div");
   obstacle.classList.add("obstacle");
-  obstacle.style.width = Math.random() * 20 + 20 + "px";
-  obstacle.style.height = Math.random() * 20 + 20 + "px";
-  obstacle.style.backgroundColor = "black";
+  obstacle.style.backgroundImage = "url('https://i.imgur.com/0PPeeHh.png')";
   obstacle.style.right = "0";
-  obstacle.style.borderRadius = Math.random() < 0.5 ? "50%" : "0";
   game.appendChild(obstacle);
 
   let obstaclePosition = 0;
@@ -313,3 +313,6 @@ volumeControl.addEventListener("input", () => {
   </script>
 </body>
 </html>
+
+
+@tristanpaulnguyen
