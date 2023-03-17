@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Millie Jumps</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    #game {
+      position: relative;
+      width: 1536px;
+      height: 864px;
+      background-image: url('https://i.imgur.com/Z3Pss8r.png');
+      overflow: hidden;
+      margin: auto;
+    }
+    #player, .obstacle, #chaser, .cloud, .tree {
+      position: absolute;
+    }
+    #player, #chaser {
+      bottom: 0;
+    }
+    #player {
+      width: 98px;
+      height: 200px;
+      left: calc(33% - 15px);
+      background-image: url('https://i.imgur.com/GJiwFYj.png');
+    }
+    #chaser {
+      width: 80px;
+      height: 240px;
+      left: calc(20% - 15px);
+      background-image: url('https://i.imgur.com/TUXgJCd.png');
+    }
+    #player, #chaser {
+      background-repeat: no-repeat;
+      background-size: cover;
+      z-index: 3;
+    }
+    .obstacle {
+      bottom: 0;
+      z-index: 4;
+    }
+    .cloud {
+      width: 270px;
+      height: 150px;
+      background-image: url('https://i.imgur.com/4RqRe3k.png');
+      background-repeat: no-repeat;
+      background-size: contain;
+      z-index: 1;
+    }
+    .tree {
+      width: 562px;
+      height: 838px;
+      background-image: url('https://i.imgur.com/drqJD5l.png');
+      background-repeat: no-repeat;
+      background-size: contain;
+      z-index: 2;
+    }
+  </style>
+</head>
+<body>
+
+<audio id="backgroundMusic" loop autoplay volume="0.03">
+  <source src="https://drive.google.com/uc?export=view&id=1iF10x9XRpDnrXgqUwwtiTxeHoiGyDaYR" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>
+<label for="volumeControl">Volume:</label>
+<input type="range" id="volumeControl" min="0" max="1" step="0.01" value="0.03">
+
+  <h1>Millie Jumps</h1>
+  <p>Press Spacebar to jump over the obstacles!</p>
+  <div id="game">
+    <div id="player"></div>
+    <div id="chaser"></div>
+  </div>
+  <p>Score: <span id="score">0</span></p>
+  <button id="restart" onclick="restartGame()" style="display: none;">Restart</button>
+  <script>
+
+    const backgroundMusic = document.getElementById("backgroundMusic");
+
+    function playBackgroundMusic() {
+      backgroundMusic.play();
+    }
+
+    function pauseBackgroundMusic() {
+      backgroundMusic.pause();
+    }
+
+
+    const game = document.getElementById("game");
+    const player = document.getElementById("player");
+    const chaser = document.getElementById("chaser");
+    const scoreElement = document.getElementById("score");
+    const restartButton = document.getElementById("restart");
+    let isJumping = [false, false];
+    let obstacleSpeed = 5;
+    let obstacleIntervals = []; 
+    let score = 0;
+    let gameActive = true;
+    let obstacleTimeout;
+    let bgElementTimeout;
+
+    function jump(index) {
+      if (!isJumping[index]) {
+        isJumping[index] = true;
+        let jumpHeight = 0;
+        let jumpInterval = setInterval(() => {
+          (index === 0 ? player : chaser).style.bottom = jumpHeight + "px";
+          jumpHeight += 20;
+
+          if (jumpHeight > 300) {
+            clearInterval(jumpInterval);
+            let fallInterval = setInterval(() => {
+(index === 0 ? player : chaser).style.bottom = jumpHeight + "px";
+jumpHeight -= 5;
+
+          if (jumpHeight < 0) {
+            clearInterval(fallInterval);
+            isJumping[index] = false;
+          }
+        }, 8);
+      }
+    }, 8);
+  }
+}
+
+function createObstacle() {
+  if (!gameActive) {
+    return;
+  }
+
+  const obstacle = document.createElement("div");
+  obstacle.classList.add("obstacle");
+  obstacle.style.width = Math.random() * 20 + 20 + "px";
+  obstacle.style.height = Math.random() * 20 + 20 + "px";
+  obstacle.style.backgroundColor = "black";
+  obstacle.style.right = "0";
+  obstacle.style.borderRadius = Math.random() < 0.5 ? "50%" : "0";
+  game.appendChild(obstacle);
+
+  let obstaclePosition = 0;
+  let obstacleInterval = setInterval(() => {
+    if (!gameActive) {
+      clearInterval(obstacleInterval);
+      return;
+    }
+
+    obstacle.style.right = obstaclePosition + "px";
+    obstaclePosition += obstacleSpeed;
+
+    if (obstaclePosition > game.offsetWidth) {
+      clearInterval(obstacleInterval);
+      game.removeChild(obstacle);
+      increaseScore();
+    }
+
+    let playerRect = player.getBoundingClientRect();
+    let chaserRect = chaser.getBoundingClientRect();
+    let obstacleRect = obstacle.getBoundingClientRect();
+
+    const playerPadding = 10;
+    const obstaclePadding = 0;
+
+    if (playerRect.right - playerPadding > obstacleRect.left + obstaclePadding &&
+        playerRect.left + playerPadding < obstacleRect.right - obstaclePadding &&
+        playerRect.bottom - playerPadding > obstacleRect.top + obstaclePadding &&
+        playerRect.top + playerPadding < obstacleRect.bottom - obstaclePadding) {
+      clearInterval(obstacleInterval);
+      gameOver();
+    }
+
+    if (chaserRect.right - playerPadding > obstacleRect.left + obstaclePadding &&
+        chaserRect.left + playerPadding < obstacleRect.right - obstaclePadding &&
+        chaserRect.bottom - playerPadding > obstacleRect.top + obstaclePadding &&
+        chaserRect.top + playerPadding < obstacleRect.bottom - obstaclePadding) {
+      jump(1);
+    }
+  }, 20);
+
+  obstacleIntervals.push(obstacleInterval);
+  scheduleObstacleCreation();
+  obstacleSpeed *= 1.030;
+}
+
+function scheduleObstacleCreation() {
+  if (obstacleTimeout) {
+    clearTimeout(obstacleTimeout);
+  }
+  obstacleTimeout = setTimeout(createObstacle, Math.random() * 3000 + 1000);
+}
+
+function gameOver() {
+  gameActive = false;
+  restartButton.style.display = "inline-block";
+  pauseBackgroundMusic();
+}
+
+function clearObstacles() {
+  const obstacles = document.querySelectorAll(".obstacle");
+  for (const obstacle of obstacles) {
+    game.removeChild(obstacle);
+  }
+}
+
+function clearObstacleIntervals() {
+  for (const interval of obstacleIntervals) {
+    clearInterval(interval);
+  }
+  obstacleIntervals = [];
+}
+
+function restartGame() {
+  gameActive = true;
+  restartButton.style.display = "none";
+  score = 0;
+  scoreElement.innerText = score;
+  obstacleSpeed = 5;
+  clearObstacles();
+  clearObstacleIntervals();
+  clearBackgroundElements();
+  scheduleObstacleCreation();
+  scheduleBackgroundElements();
+  playBackgroundMusic();
+}
+
+function increaseScore() {
+  score++;
+  scoreElement.innerText = score;
+}
+
+function createBackgroundElement(type) {
+  const bgElement = document.createElement("div");
+  bgElement.classList.add(type);
+
+  const width = type === "cloud" ? 250 : 562 * 0.5;
+const height = type === "cloud" ? 130 : 838 * 0.5;
+
+  bgElement.style.width = width + "px";
+  bgElement.style.height = height + "px";
+  bgElement.style.right = "0";
+
+  const yPos = type === "cloud" ? Math.random() * (game.offsetHeight - height) : game.offsetHeight - height;
+  bgElement.style.top = yPos + "px";
+  game.appendChild(bgElement);
+
+  let bgElementPosition = 0;
+  let bgElementSpeed = type === "cloud" ? 2 : 3;
+  let bgElementInterval = setInterval(() => {
+    if (!gameActive) {
+      clearInterval(bgElementInterval);
+      return;
+    }
+
+    bgElement.style.right = bgElementPosition + "px";
+    bgElementPosition += bgElementSpeed;
+
+    if (bgElementPosition > game.offsetWidth) {
+      clearInterval(bgElementInterval);
+      game.removeChild(bgElement);
+    }
+  }, 20);
+}
+
+function clearBackgroundElements() {
+  const clouds = document.querySelectorAll(".cloud");
+  for (const cloud of clouds) {
+    game.removeChild(cloud);
+  }
+  const trees = document.querySelectorAll(".tree");
+  for (const tree of trees) {
+    game.removeChild(tree);
+  }
+}
+
+function scheduleBackgroundElements() {
+  setTimeout(() => {
+    if (!gameActive) {
+      return;
+    }
+    const type = Math.random() < 0.5 ? "cloud" : "tree";
+    createBackgroundElement(type);
+    scheduleBackgroundElements();
+  }, Math.random() * 5000 + 2000);
+}
+
+document.body.addEventListener("keydown", event => {
+  if (event.code === "Space") {
+    event.preventDefault();
+    jump(0);
+  }
+});
+
+game.addEventListener("touchstart", event => {
+  event.preventDefault();
+  jump(0);
+});
+
+scheduleObstacleCreation();
+scheduleBackgroundElements();
+
+const volumeControl = document.getElementById("volumeControl");
+
+volumeControl.addEventListener("input", () => {
+  backgroundMusic.volume = volumeControl.value;
+});
+
+
+  </script>
+</body>
+</html>
