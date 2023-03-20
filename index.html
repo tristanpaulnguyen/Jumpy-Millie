@@ -128,21 +128,21 @@
         let jumpHeight = 0;
         let jumpInterval = setInterval(() => {
           (index === 0 ? player : chaser).style.bottom = jumpHeight + "px";
-          jumpHeight += 25;
+          jumpHeight += 20;
 
-          if (jumpHeight > 310) {
+          if (jumpHeight > 320) {                   // Max jump height
             clearInterval(jumpInterval);
             let fallInterval = setInterval(() => {
 (index === 0 ? player : chaser).style.bottom = jumpHeight + "px";
-jumpHeight -= 6;
+jumpHeight -= 5;
 
           if (jumpHeight < 0) {
             clearInterval(fallInterval);
             isJumping[index] = false;
           }
-        }, 8);
+        }, 12); // Change the interval duration to 12 milliseconds for falling
       }
-    }, 8);
+    }, 12); // Interval duration for jumping (upward movement)
   }
 }
 
