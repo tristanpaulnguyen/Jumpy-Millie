@@ -128,13 +128,13 @@
         let jumpHeight = 0;
         let jumpInterval = setInterval(() => {
           (index === 0 ? player : chaser).style.bottom = jumpHeight + "px";
-          jumpHeight += 20;
+          jumpHeight += 25;
 
-          if (jumpHeight > 300) {
+          if (jumpHeight > 310) {
             clearInterval(jumpInterval);
             let fallInterval = setInterval(() => {
 (index === 0 ? player : chaser).style.bottom = jumpHeight + "px";
-jumpHeight -= 5;
+jumpHeight -= 6;
 
           if (jumpHeight < 0) {
             clearInterval(fallInterval);
